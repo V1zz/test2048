@@ -17,12 +17,7 @@ namespace _2048
         //Map size property
         public int size => map.size;
 
-        public Model()
-        {
-            
-        }
-
-        public Model(int size) 
+        public Model(int size)
         {
             map = new Map(size);
             isGameOver = false;
@@ -32,22 +27,32 @@ namespace _2048
         public void Start()
         {
             for (int x = 0; x < size; x++)
-            for (int y = 0; y < size; y++)
-            {
-                 map.Set(x, y, 0);
-            }
+                for (int y = 0; y < size; y++)
+                {
+                    map.Set(x, y, 0);
+                }
 
             AddRandomNumber();
             AddRandomNumber();
         }
-
-        //Method for generating a random number
+        
+        //todo: 42:40 - need optimization
+        //Method for for adding a random number to an empty field
         private void AddRandomNumber()
         {
-            if(IsGameOver()) return;
-
+            if (IsGameOver()) return;
+            for (int i = 0; i < 100; i++)
+            {
+                int x = _rand.Next(0, map.size);
+                int y = _rand.Next(0, map.size);
+                if (map.Get(x, y) == 0)
+                {
+                    map.Set(x, y, _rand.NextDouble() > 0.8 ? 4 : 2);
+                    return;
+                }
+            }
             //random generator
-            int tmp = _rand.NextDouble() > 0.8 ? 4 : 2;
+            //int tmp = _rand.NextDouble() > 0.8 ? 4 : 2;
         }
 
         //Game state change method
