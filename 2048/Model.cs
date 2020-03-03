@@ -1,4 +1,5 @@
 ﻿
+//todo: Create helper class to render redundant functionality
 
 using System;
 
@@ -8,7 +9,8 @@ namespace _2048
     {
         //Map instance
         Map map;
-
+        //Randomizer
+        private static readonly Random _rand = new Random();
         //Game state variable 
         bool isGameOver;
 
@@ -34,6 +36,18 @@ namespace _2048
             {
                  map.Set(x, y, 0);
             }
+
+            AddRandomNumber();
+            AddRandomNumber();
+        }
+
+        //Method for generating a random number
+        private void AddRandomNumber()
+        {
+            if(IsGameOver()) return;
+
+            //random generator
+            int tmp = _rand.NextDouble() > 0.8 ? 4 : 2;
         }
 
         //Game state change method
@@ -47,6 +61,8 @@ namespace _2048
         {
             return map.Get(x, y);
         }
+
+        #region Control reading methods
 
         public void Left()
         {
@@ -67,5 +83,7 @@ namespace _2048
         {
 
         }
+
+        #endregion
     }
 }
