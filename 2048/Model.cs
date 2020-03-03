@@ -8,32 +8,51 @@ namespace _2048
     public class Model
     {
         //Map instance
-        Map map;
+        private Map _map;
         //Randomizer
         private static readonly Random _rand = new Random();
         //Game state variable 
-        bool isGameOver;
+        private bool _isGameOver;
+        //Block randomization if numbers did`n move
+        private bool _moved;
 
         //Map size property
-        public int size => map.size;
+        public int size => _map.size;
 
         public Model(int size)
         {
-            map = new Map(size);
-            isGameOver = false;
+            _map = new Map(size);
+            _isGameOver = false;
         }
 
         //Game start initialization method
         public void Start()
         {
+            _isGameOver = false;
             for (int x = 0; x < size; x++)
                 for (int y = 0; y < size; y++)
                 {
-                    map.Set(x, y, 0);
+                    _map.Set(x, y, 0);
                 }
 
             AddRandomNumber();
             AddRandomNumber();
+        }
+
+        //Game state change method
+        public bool IsGameOver()
+        {
+            //true
+            if(_isGameOver) return _isGameOver;
+            //false
+            for (int x = 0; x < size; x++)
+                for (int y = 0; y < size; y++)
+                    if (_map.Get(x, y) == 0 ||
+                        _map.Get(x, y) == _map.Get(x + 1, y) ||
+                        _map.Get(x, y) == _map.Get(x, y + 1))
+                        return false;
+            _isGameOver = true;
+            return _isGameOver;
         }
 
         //todo: 42:40 - need optimization
@@ -43,42 +62,37 @@ namespace _2048
             if (IsGameOver()) return;
             for (int i = 0; i < 100; i++)
             {
-                int x = _rand.Next(0, map.size);
-                int y = _rand.Next(0, map.size);
-                if (map.Get(x, y) != 0) continue;
-                map.Set(x, y, _rand.NextDouble() > 0.8 ? 4 : 2);
+                int x = _rand.Next(0, _map.size);
+                int y = _rand.Next(0, _map.size);
+                if (_map.Get(x, y) != 0) continue;
+                _map.Set(x, y, _rand.NextDouble() > 0.8 ? 4 : 2);
                 return;
             }
             //random generator
             //int tmp = _rand.NextDouble() > 0.8 ? 4 : 2;
         }
 
-        //Game state change method
-        public bool IsGameOver()
-        {
-            return isGameOver;
-        }
-
         //Getting value to display
         public int GetMap(int x, int y)
         {
-            return map.Get(x, y);
+            return _map.Get(x, y);
         }
 
-        #region Control reading methods
+#region Control reading methods
 
         //Number offset before summing
         //  x,  y  - from position
         //  sx, sy - to position
         private void Offset(int x, int y, int sx, int sy)
         {
-            if (map.Get(x, y) == 0) return;
-            while (map.Get(x + sx, y + sy) == 0)
+            if (_map.Get(x, y) == 0) return;
+            while (_map.Get(x + sx, y + sy) == 0)
             {
-                map.Set(x + sx, y + sy, map.Get(x, y));
-                map.Set(x, y, 0);
+                _map.Set(x + sx, y + sy, _map.Get(x, y));
+                _map.Set(x, y, 0);
                 x += sx;
                 y += sy;
+                _moved = true;
             }
         }
 
@@ -87,78 +101,77 @@ namespace _2048
         //  sx, sy - to position
         private void Summ(int x, int y, int sx, int sy)
         {
-            if (map.Get(x, y) == 0 || map.Get(x + sx, y + sy) != map.Get(x, y))
+            if (_map.Get(x, y) == 0 || _map.Get(x + sx, y + sy) != _map.Get(x, y))
                 return;
 
-            map.Set(x + sx, y + sy, map.Get(x, y) * 2);
+            _map.Set(x + sx, y + sy, _map.Get(x, y) * 2);
 
-            while (map.Get(x - sx, y - sy) > 0)
+            while (_map.Get(x - sx, y - sy) > 0)
             {
-                map.Set(x, y, map.Get(x - sx, y - sy));
+                _map.Set(x, y, _map.Get(x - sx, y - sy));
                 x -= sx;
                 y -= sy;
             }
 
-            map.Set(x, y, 0);
+            _map.Set(x, y, 0);
+            _moved = true;
         }
 
         //(x, y, -1, 0)
         public void Left()
         {
-            for (int y = 0; y < map.size; y++)
+            _moved = false;
+            for (int y = 0; y < _map.size; y++)
             {
-                for (int x = 1; x < map.size; x++)
+                for (int x = 1; x < _map.size; x++)
                     Offset(x, y, -1, 0);
-                for (int x = 1; x < map.size; x++)
+                for (int x = 1; x < _map.size; x++)
                     Summ(x, y, -1, 0);
             }
-
-            AddRandomNumber();
-            AddRandomNumber();
+            if(_moved) AddRandomNumber();
         }
 
         //(x, y, +1, 0)
         public void Right()
         {
-            for (int y = 0; y < map.size; y++)
+            _moved = false;
+            for (int y = 0; y < _map.size; y++)
             {
-                for (int x = map.size - 2; x >= 0; x--)
+                for (int x = _map.size - 2; x >= 0; x--)
                     Offset(x, y, +1, 0);
-                for (int x = map.size - 2; x >= 0; x--)
+                for (int x = _map.size - 2; x >= 0; x--)
                     Summ(x, y, +1, 0);
             }
-            AddRandomNumber();
-            AddRandomNumber();
+            if(_moved) AddRandomNumber();
         }
 
         //(x, y, 0, -1)
         public void Up()
         {
-            for (int x = 0; x < map.size; x++)
+            _moved = false;
+            for (int x = 0; x < _map.size; x++)
             {
-                for (int y = 1; y < map.size; y++)
+                for (int y = 1; y < _map.size; y++)
                     Offset(x, y, 0, -1);
-                for (int y = 1; y < map.size; y++)
+                for (int y = 1; y < _map.size; y++)
                     Summ(x, y, 0, -1);
             }
-            AddRandomNumber();
-            AddRandomNumber();
+            if(_moved) AddRandomNumber();
         }
 
         //(x, y, 0, +1)
         public void Down()
         {
-            for (int x = 0; x < map.size; x++)
+            _moved = false;
+            for (int x = 0; x < _map.size; x++)
             {
-                for (int y = map.size - 2; y >= 0; y--)
+                for (int y = _map.size - 2; y >= 0; y--)
                     Offset(x, y, 0, +1);
-                for (int y = map.size - 2; y >= 0; y--)
+                for (int y = _map.size - 2; y >= 0; y--)
                     Summ(x, y, 0, +1);
             }
-            AddRandomNumber();
-            AddRandomNumber();
+            if(_moved) AddRandomNumber();
         }
-
-        #endregion
+#endregion
     }
 }
