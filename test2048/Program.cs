@@ -53,7 +53,7 @@ namespace test2048
                     Console.SetCursorPosition(x * 5 + 5, y * 2 + 2);
                     var number = model.GetMap(x, y);
                     //Two extra spaces so that numbers do not overlap
-                    Console.Write(number == 0 ? "   " : number.ToString() + "  ");
+                    Console.Write(number == 0 ? ".  " : number.ToString() + "  ");
                 }
             Console.WriteLine();
             //Game over checking
@@ -63,6 +63,7 @@ namespace test2048
             }
             else
             {
+                Console.WriteLine();
                 Console.WriteLine("____Still Play____");
             }
         }
