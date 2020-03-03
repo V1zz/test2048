@@ -36,7 +36,7 @@ namespace test2048
                     case ConsoleKey.RightArrow: model.Right(); break;
                     case ConsoleKey.UpArrow:    model.Up(); break;
                     case ConsoleKey.DownArrow:  model.Down(); break;
-                    case ConsoleKey.Escape:     model.Start(); break;
+                    case ConsoleKey.Escape:     return;
                 }
             }
         }
