@@ -1,34 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+
+using System;
 
 namespace _2048
 {
     public class Model
     {
-        private bool isGameOver;
-        public int size { get; private set; }
+        //Map instance
+        Map map;
 
-        public Model(int size)
+        //Game state variable 
+        bool isGameOver;
+
+        //Map size property
+        public int size => map.size;
+
+        public Model()
         {
-            this.size = size;
+            
         }
 
+        public Model(int size) 
+        {
+            map = new Map(size);
+            isGameOver = false;
+        }
+
+        //Game start initialization method
         public void Start()
         {
-
+            for (int x = 0; x < size; x++)
+            for (int y = 0; y < size; y++)
+            {
+                 map.Set(x, y, 0);
+            }
         }
 
+        //Game state change method
         public bool IsGameOver()
         {
             return isGameOver;
         }
 
-        public int GetMap(int i, int i1)
+        //Getting value to display
+        public int GetMap(int x, int y)
         {
-            return -1;
+            return map.Get(x, y);
         }
 
         public void Left()
